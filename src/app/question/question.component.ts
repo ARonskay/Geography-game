@@ -59,15 +59,32 @@ export class QuestionComponent implements OnInit {
     this.isTimeout = false;
   
     if (this.questionNumber >= 10) {
-      this.showResultButton = true; 
+      this.showResultButton = true;
       return;
     }
   
-    this.apiService.getRandomCountries(3).subscribe(
+    let numberOfOptions: number;
+  
+    switch (this.selectedDifficulty) {
+      case 'easy':
+        numberOfOptions = 3;
+        break;
+      case 'medium':
+        numberOfOptions = 4;
+        break;
+      case 'hard':
+        numberOfOptions = 5;
+        break;
+      default:
+        numberOfOptions = 3; 
+        break;
+    }
+  
+    this.apiService.getRandomCountries(numberOfOptions).subscribe(
       (countries) => {
         this.country = countries[0];
         this.answerOptions = this.apiService.shuffleArray(countries.slice(1));
-        const randomIndex = Math.floor(Math.random() * 3);
+        const randomIndex = Math.floor(Math.random() * numberOfOptions);
         this.answerOptions.splice(randomIndex, 0, this.country);
         this.questionNumber++;
   
@@ -75,8 +92,8 @@ export class QuestionComponent implements OnInit {
         this.interval = setInterval(() => {
           this.timeLeft--;
           if (this.timeLeft === 0) {
-            this.isTimeout = true; 
-            this.checkAnswer(null); 
+            this.isTimeout = true;
+            this.checkAnswer(null);
           }
         }, 1000);
       },
@@ -85,6 +102,7 @@ export class QuestionComponent implements OnInit {
       }
     );
   }
+  
   
   
 
